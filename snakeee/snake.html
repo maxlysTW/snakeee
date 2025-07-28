@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <title>SNAKEEE - Retrowave</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,6 +34,7 @@
       html,
       body {
         height: 100%;
+        min-height: 100vh;
         background-color: var(--bg-color);
         background-image: linear-gradient(
             rgba(255, 255, 255, 0.07) 1px,
@@ -54,6 +55,14 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        /* 防止 iOS Safari 的彈跳效果 */
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
       }
 
       h2 {
@@ -329,73 +338,115 @@
 
       /* 響應式設計 */
       @media (max-width: 768px) {
-        .snake-container {
-          padding: 20px;
-          margin: 10px;
-          border-width: 1px;
+        html,
+        body {
+          padding: 5px;
+          height: 100vh;
+          overflow: hidden;
         }
 
-        h2 {
-          font-size: 2.5rem;
-          margin-bottom: 15px;
-        }
-
-        .board {
-          width: min(90vw, 350px);
-          height: min(90vw, 350px);
-          margin-bottom: 15px;
-        }
-
-        .joystick-container {
-          width: 180px;
-          height: 180px;
-        }
-
-        .joystick-base {
-          width: 140px;
-          height: 140px;
-        }
-
-        .joystick-stick {
-          width: 40px;
-          height: 40px;
-        }
-
-        .info {
-          flex-direction: column;
-          gap: 10px;
-          margin-bottom: 15px;
-        }
-
-        button {
-          padding: 15px 25px;
-          font-size: 1.2rem;
-        }
-      }
-
-      @media (max-width: 480px) {
         .snake-container {
           padding: 15px;
           margin: 5px;
+          border-width: 1px;
+          max-width: 100%;
+          width: 100%;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
         }
 
         h2 {
           font-size: 2rem;
+          margin-bottom: 10px;
+          flex-shrink: 0;
         }
 
         .board {
-          width: min(95vw, 320px);
-          height: min(95vw, 320px);
+          width: min(85vw, 300px);
+          height: min(85vw, 300px);
+          margin: 10px auto;
+          flex-shrink: 0;
         }
 
         .joystick-container {
-          width: 160px;
-          height: 160px;
+          width: 140px;
+          height: 140px;
+          margin: 10px auto;
+          flex-shrink: 0;
         }
 
         .joystick-base {
+          width: 110px;
+          height: 110px;
+        }
+
+        .joystick-stick {
+          width: 35px;
+          height: 35px;
+        }
+
+        .info {
+          flex-direction: row;
+          gap: 10px;
+          margin-bottom: 10px;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .score-container {
+          padding: 8px 12px;
+        }
+
+        .info span {
+          font-size: 1rem;
+        }
+
+        button {
+          padding: 10px 15px;
+          font-size: 1rem;
+          min-height: 40px;
+        }
+
+        .game-over {
+          font-size: 1rem;
+          padding: 10px;
+          margin-top: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        html,
+        body {
+          padding: 2px;
+        }
+
+        .snake-container {
+          padding: 10px;
+          margin: 2px;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          margin-bottom: 8px;
+        }
+
+        .board {
+          width: min(90vw, 280px);
+          height: min(90vw, 280px);
+          margin: 8px auto;
+        }
+
+        .joystick-container {
           width: 120px;
           height: 120px;
+          margin: 8px auto;
+        }
+
+        .joystick-base {
+          width: 90px;
+          height: 90px;
         }
 
         .joystick-stick {
@@ -403,9 +454,149 @@
           height: 30px;
         }
 
+        .info {
+          gap: 8px;
+          margin-bottom: 8px;
+        }
+
+        .score-container {
+          padding: 6px 10px;
+        }
+
+        .info span {
+          font-size: 0.9rem;
+        }
+
         button {
-          padding: 15px 25px;
-          font-size: 1.2rem;
+          padding: 8px 12px;
+          font-size: 0.9rem;
+          min-height: 36px;
+        }
+
+        .game-over {
+          font-size: 0.9rem;
+          padding: 8px;
+          margin-top: 8px;
+        }
+      }
+
+      /* 超小螢幕適配 */
+      @media (max-width: 360px) {
+        .snake-container {
+          padding: 8px;
+          margin: 1px;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          margin-bottom: 6px;
+        }
+
+        .board {
+          width: min(95vw, 260px);
+          height: min(95vw, 260px);
+          margin: 6px auto;
+        }
+
+        .joystick-container {
+          width: 100px;
+          height: 100px;
+          margin: 6px auto;
+        }
+
+        .joystick-base {
+          width: 80px;
+          height: 80px;
+        }
+
+        .joystick-stick {
+          width: 25px;
+          height: 25px;
+        }
+
+        .info {
+          gap: 6px;
+          margin-bottom: 6px;
+        }
+
+        .score-container {
+          padding: 5px 8px;
+        }
+
+        .info span {
+          font-size: 0.8rem;
+        }
+
+        button {
+          padding: 6px 10px;
+          font-size: 0.8rem;
+          min-height: 32px;
+        }
+
+        .game-over {
+          font-size: 0.8rem;
+          padding: 6px;
+          margin-top: 6px;
+        }
+      }
+
+      /* 橫向模式適配 */
+      @media (max-height: 500px) and (orientation: landscape) {
+        .snake-container {
+          height: 100vh;
+          padding: 8px;
+          flex-direction: row;
+          align-items: center;
+          gap: 10px;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          margin-bottom: 0;
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+        }
+
+        .board {
+          width: min(40vh, 200px);
+          height: min(40vh, 200px);
+          margin: 0;
+        }
+
+        .joystick-container {
+          width: 80px;
+          height: 80px;
+          margin: 0;
+        }
+
+        .joystick-base {
+          width: 60px;
+          height: 60px;
+        }
+
+        .joystick-stick {
+          width: 20px;
+          height: 20px;
+        }
+
+        .info {
+          flex-direction: column;
+          gap: 5px;
+          margin-bottom: 0;
+        }
+
+        .score-container {
+          padding: 4px 6px;
+        }
+
+        .info span {
+          font-size: 0.7rem;
+        }
+
+        button {
+          padding: 4px 8px;
+          font-size: 0.7rem;
+          min-height: 28px;
         }
       }
 
@@ -429,6 +620,27 @@
         100% {
           transform: scale(3);
           opacity: 0;
+        }
+      }
+
+      /* 防止 iOS Safari 的雙擊縮放 */
+      * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      /* 確保在各種螢幕上都有正確的顯示 */
+      @supports (padding: max(0px)) {
+        .snake-container {
+          padding-left: max(15px, env(safe-area-inset-left));
+          padding-right: max(15px, env(safe-area-inset-right));
+          padding-top: max(15px, env(safe-area-inset-top));
+          padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
       }
     </style>
@@ -758,6 +970,15 @@
           joystickStick.addEventListener("touchend", handleJoystickEnd, {
             passive: false,
           });
+
+          // 防止搖桿區域的滾動
+          joystickStick.addEventListener(
+            "touchstart",
+            (e) => {
+              e.preventDefault();
+            },
+            { passive: false }
+          );
 
           // 滑鼠控制（桌面版）
           joystickStick.addEventListener("mousedown", (e) => {
