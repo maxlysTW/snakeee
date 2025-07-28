@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>SNAKEEE - Retrowave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <!-- version: b06c.5 -->
+    <style>
+      /* Retrowave/Synthwave Theme */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        touch-action: manipulation;
+      }
+
+      :root {
+        --primary-glow: #00f7ff;
+        --secondary-glow: #f900ff;
+        --food-glow: #fef02a;
+        --bg-color: #0d0221;
+        --grid-bg: #130f2d;
+      }
+
+      html,
+      body {
+        height: 100%;
+        background-color: var(--bg-color);
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0.07) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+        background-size: 30px 30px;
+        background-position: -1px -1px;
+        color: #fff;
+        font-family: "Share Tech Mono", "Courier New", monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        overflow: hidden;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        font-size: 3rem;
+        font-weight: 400;
+        color: var(--primary-glow);
+        text-shadow: 0 0 5px var(--primary-glow), 0 0 10px var(--primary-glow),
+          0 0 20px var(--primary-glow), 0 0 40px var(--primary-glow);
+        letter-spacing: 4px;
+        animation: text-flicker 3s infinite alternate;
+      }
+
+      @keyframes text-flicker {
+        from {
+          text-shadow: 0 0 5px var(--primary-glow), 0 0 10px var(--primary-glow),
+            0 0 20px var(--primary-glow);
+        }
+        to {
+          text-shadow: 0 0 5px var(--primary-glow), 0 0 12px var(--primary-glow),
+            0 0 25px var(--primary-glow);
+        }
+      }
+
+      .snake-container {
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+        background: rgba(13, 2, 33, 0.85);
+        backdrop-filter: blur(4px);
+        border-radius: 16px;
+        padding: 30px;
+        border: 2px solid var(--secondary-glow);
+        box-shadow: 0 0 15px -2px var(--secondary-glow),
+          0 0 25px -5px var(--secondary-glow) inset;
+      }
+
+      .board {
+        --size: 20;
+        display: grid;
+        grid-template-columns: repeat(var(--size), 1fr);
+        grid-template-rows: repeat(var(--size), 1fr);
+        gap: 2px;
+        width: min(85vw, 400px);
+        height: min(85vw, 400px);
+        margin: 0 auto 20px;
+        background: var(--grid-bg);
+        border: 1px solid var(--primary-glow);
+        box-shadow: 0 0 8px var(--primary-glow);
+        border-radius: 12px;
+        padding: 6px;
+        touch-action: none;
+      }
+
+      .cell {
+        background: transparent;
+        border-radius: 2px;
+        transition: all 0.2s;
+      }
+
+      .snake {
+        background: var(--secondary-glow);
+        box-shadow: 0 0 5px var(--secondary-glow),
+          0 0 10px var(--secondary-glow);
+        animation: snake-pulse 1s infinite alternate;
+        border-radius: 3px;
+      }
+
+      @keyframes snake-pulse {
+        from {
+          transform: scale(1);
+          box-shadow: 0 0 5px var(--secondary-glow),
+            0 0 10px var(--secondary-glow);
+        }
+        to {
+          transform: scale(1.05);
+          box-shadow: 0 0 8px var(--secondary-glow),
+            0 0 15px var(--secondary-glow);
+        }
+      }
+
+      .food {
+        background: var(--food-glow);
+        box-shadow: 0 0 10px var(--food-glow), 0 0 20px var(--food-glow);
+        animation: food-pulse-alt 0.8s infinite alternate;
+        border-radius: 50%;
+      }
+
+      @keyframes food-pulse-alt {
+        from {
+          transform: scale(1);
+        }
+        to {
+          transform: scale(1.15);
+        }
+      }
+
+      .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .score-container {
+        background: transparent;
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: 1px solid var(--primary-glow);
+      }
+
+      .info span {
+        font-size: 1.2rem;
+        color: var(--primary-glow);
+        text-shadow: 0 0 3px var(--primary-glow);
+      }
+
+      button {
+        padding: 12px 22px;
+        font-size: 1.1rem;
+        font-family: inherit;
+        border: 2px solid var(--secondary-glow);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--secondary-glow);
+        cursor: pointer;
+        text-shadow: 0 0 5px var(--secondary-glow);
+        box-shadow: 0 0 2px var(--secondary-glow) inset,
+          0 0 4px var(--secondary-glow);
+        transition: all 0.3s ease;
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      button:hover {
+        background: var(--secondary-glow);
+        color: var(--bg-color);
+        box-shadow: 0 0 10px var(--secondary-glow),
+          0 0 20px var(--secondary-glow);
+        text-shadow: none;
+      }
+
+      button:active {
+        transform: scale(0.95);
+      }
+
+      .game-over {
+        color: var(--secondary-glow);
+        font-size: 1.3rem;
+        font-weight: 400;
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid var(--secondary-glow);
+        text-shadow: 0 0 5px var(--secondary-glow);
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 搖桿控制 */
+      .joystick-container {
+        width: 200px;
+        height: 200px;
+        margin: 20px auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .joystick-base {
+        width: 160px;
+        height: 160px;
+        border: 3px solid var(--primary-glow);
+        border-radius: 50%;
+        background: rgba(13, 2, 33, 0.8);
+        position: relative;
+        box-shadow: 0 0 15px var(--primary-glow),
+          inset 0 0 20px rgba(0, 247, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .joystick-stick {
+        width: 60px;
+        height: 60px;
+        background: var(--secondary-glow);
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 10px var(--secondary-glow),
+          inset 0 0 10px rgba(249, 0, 255, 0.3);
+        cursor: pointer;
+        transition: all 0.1s ease;
+        z-index: 10;
+      }
+
+      .joystick-stick:active {
+        transform: translate(-50%, -50%) scale(0.95);
+        box-shadow: 0 0 15px var(--secondary-glow);
+      }
+
+      /* 方向指示器 */
+      .direction-indicators {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .direction-indicator {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: rgba(0, 247, 255, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: var(--primary-glow);
+        text-shadow: 0 0 3px var(--primary-glow);
+      }
+
+      .direction-indicator.up {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .direction-indicator.down {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .direction-indicator.left {
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .direction-indicator.right {
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      /* 搖桿移動動畫 */
+      .joystick-stick.moving {
+        transition: all 0.05s ease;
+      }
+
+      /* 隱藏方向按鈕 */
+      .direction-controls {
+        display: none;
+      }
+
+      /* 響應式設計 */
+      @media (max-width: 768px) {
+        .snake-container {
+          padding: 20px;
+          margin: 10px;
+          border-width: 1px;
+        }
+
+        h2 {
+          font-size: 2.5rem;
+          margin-bottom: 15px;
+        }
+
+        .board {
+          width: min(90vw, 350px);
+          height: min(90vw, 350px);
+          margin-bottom: 15px;
+        }
+
+        .joystick-container {
+          width: 180px;
+          height: 180px;
+        }
+
+        .joystick-base {
+          width: 140px;
+          height: 140px;
+        }
+
+        .joystick-stick {
+          width: 40px;
+          height: 40px;
+        }
+
+        .info {
+          flex-direction: column;
+          gap: 10px;
+          margin-bottom: 15px;
+        }
+
+        button {
+          padding: 15px 25px;
+          font-size: 1.2rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .snake-container {
+          padding: 15px;
+          margin: 5px;
+        }
+
+        h2 {
+          font-size: 2rem;
+        }
+
+        .board {
+          width: min(95vw, 320px);
+          height: min(95vw, 320px);
+        }
+
+        .joystick-container {
+          width: 160px;
+          height: 160px;
+        }
+
+        .joystick-base {
+          width: 120px;
+          height: 120px;
+        }
+
+        .joystick-stick {
+          width: 30px;
+          height: 30px;
+        }
+
+        button {
+          padding: 15px 25px;
+          font-size: 1.2rem;
+        }
+      }
+
+      /* 觸控反饋 */
+      .touch-feedback {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: var(--primary-glow);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 1000;
+        animation: touchRipple 0.6s ease-out forwards;
+      }
+
+      @keyframes touchRipple {
+        0% {
+          transform: scale(0);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(3);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="snake-container">
+      <h2>SNAKEEE</h2>
+      <div class="board" id="board"></div>
+      <div class="info">
+        <div class="score-container">
+          <span>分數: <span id="score">0</span></span>
+        </div>
+        <button id="restartBtn">開始遊戲</button>
+      </div>
+
+      <!-- 搖桿控制 -->
+      <div class="joystick-container">
+        <div class="joystick-base">
+          <div class="joystick-stick" id="joystick-stick"></div>
+        </div>
+      </div>
+
+      <div class="wheel" id="wheel"></div>
+      <p id="gameOver" class="game-over" style="display: none">
+        遊戲結束！按空白鍵或點「重新開始」重試
+      </p>
+    </div>
+
+    <script>
+      (function () {
+        const boardSize = 20,
+          initialSnake = [
+            { x: 8, y: 10 },
+            { x: 7, y: 10 },
+            { x: 6, y: 10 },
+          ],
+          directions = {
+            ArrowUp: { x: 0, y: -1 },
+            ArrowDown: { x: 0, y: 1 },
+            ArrowLeft: { x: -1, y: 0 },
+            ArrowRight: { x: 1, y: 0 },
+          },
+          opposite = {
+            ArrowUp: "ArrowDown",
+            ArrowDown: "ArrowUp",
+            ArrowLeft: "ArrowRight",
+            ArrowRight: "ArrowLeft",
+          };
+        let snake,
+          dir,
+          nextDir,
+          food,
+          score,
+          gameOver,
+          timer,
+          gameStarted = false;
+        let touchStartX = 0,
+          touchStartY = 0;
+        let joystickActive = false;
+        const boardEl = document.getElementById("board"),
+          scoreEl = document.getElementById("score"),
+          restartBtn = document.getElementById("restartBtn"),
+          gameOverEl = document.getElementById("gameOver"),
+          wheel = document.getElementById("wheel"),
+          joystickStick = document.getElementById("joystick-stick");
+
+        function createBoard() {
+          boardEl.innerHTML = "";
+          boardEl.style.setProperty("--size", boardSize);
+          for (let y = 0; y < boardSize; y++) {
+            for (let x = 0; x < boardSize; x++) {
+              let cell = document.createElement("div");
+              cell.classList.add("cell");
+              cell.dataset.x = x;
+              cell.dataset.y = y;
+              boardEl.appendChild(cell);
+            }
+          }
+        }
+
+        function randomFood() {
+          let pos;
+          do {
+            pos = {
+              x: Math.floor(Math.random() * boardSize),
+              y: Math.floor(Math.random() * boardSize),
+            };
+          } while (snake.some((s) => s.x === pos.x && s.y === pos.y));
+          return pos;
+        }
+
+        function updateBoard() {
+          boardEl.querySelectorAll(".cell").forEach((c) => {
+            const x = +c.dataset.x,
+              y = +c.dataset.y;
+            c.classList.remove("snake", "food");
+            if (snake.some((s) => s.x === x && s.y === y))
+              c.classList.add("snake");
+            else if (food.x === x && food.y === y) c.classList.add("food");
+          });
+          scoreEl.textContent = score;
+        }
+
+        function move() {
+          if (gameOver || !gameStarted) return;
+          dir = nextDir;
+          const off = directions[dir],
+            head = { x: snake[0].x + off.x, y: snake[0].y + off.y };
+          if (
+            head.x < 0 ||
+            head.x >= boardSize ||
+            head.y < 0 ||
+            head.y >= boardSize ||
+            snake.some((s) => s.x === head.x && s.y === head.y)
+          ) {
+            gameOver = true;
+            gameStarted = false;
+            clearInterval(timer);
+            gameOverEl.style.display = "block";
+            // 添加震動效果
+            document.body.style.animation = "shake 0.5s ease-in-out";
+            setTimeout(() => {
+              document.body.style.animation = "";
+            }, 500);
+            return;
+          }
+          snake.unshift(head);
+          if (head.x === food.x && head.y === food.y) {
+            score++;
+            food = randomFood();
+            // 添加分數增加動畫
+            scoreEl.style.transform = "scale(1.2)";
+            setTimeout(() => {
+              scoreEl.style.transform = "scale(1)";
+            }, 200);
+          } else snake.pop();
+          updateBoard();
+        }
+
+        function startGame() {
+          if (gameStarted) return;
+          gameStarted = true;
+          gameOver = false;
+          gameOverEl.style.display = "none";
+          snake = initialSnake.map((p) => ({ ...p }));
+          dir = nextDir = "ArrowRight";
+          food = randomFood();
+          score = 0;
+          updateBoard();
+          timer = setInterval(move, 120);
+          restartBtn.textContent = "重新開始";
+        }
+
+        function restart() {
+          clearInterval(timer);
+          gameStarted = false;
+          gameOver = false;
+          gameOverEl.style.display = "none";
+          snake = initialSnake.map((p) => ({ ...p }));
+          dir = nextDir = "ArrowRight";
+          food = randomFood();
+          score = 0;
+          updateBoard();
+          restartBtn.textContent = "開始遊戲";
+        }
+
+        function handleKey(e) {
+          if (e.code === "Space") {
+            if (gameOver) restart();
+            else if (!gameStarted) startGame();
+            e.preventDefault();
+            return;
+          }
+          if (!gameStarted) return;
+          if (!directions[e.code]) return;
+          if (opposite[e.code] !== dir) nextDir = e.code;
+        }
+
+        // 搖桿控制
+        function handleJoystickStart(e) {
+          if (!gameStarted) return;
+          e.preventDefault();
+          joystickActive = true;
+          joystickStick.classList.add("moving");
+          handleJoystickMove(e);
+        }
+
+        function handleJoystickMove(e) {
+          if (!joystickActive || !gameStarted) return;
+          e.preventDefault();
+
+          const rect = joystickStick.parentElement.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+
+          const touch = e.touches ? e.touches[0] : e;
+          const deltaX = touch.clientX - centerX;
+          const deltaY = touch.clientY - centerY;
+
+          // 計算搖桿移動距離
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const maxDistance = rect.width / 2 - 30; // 搖桿最大移動距離
+
+          if (distance > maxDistance) {
+            // 限制搖桿移動範圍
+            const angle = Math.atan2(deltaY, deltaX);
+            const moveX = Math.cos(angle) * maxDistance;
+            const moveY = Math.sin(angle) * maxDistance;
+            joystickStick.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+          } else {
+            joystickStick.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+          }
+
+          // 根據搖桿位置決定方向
+          const angle = (Math.atan2(deltaY, deltaX) * 180) / Math.PI;
+          let newDirection = dir; // 保持當前方向
+
+          if (distance > 20) {
+            // 最小移動閾值
+            if (angle >= -45 && angle < 45) {
+              newDirection = "ArrowRight";
+            } else if (angle >= 45 && angle < 135) {
+              newDirection = "ArrowDown";
+            } else if (angle >= 135 || angle < -135) {
+              newDirection = "ArrowLeft";
+            } else {
+              newDirection = "ArrowUp";
+            }
+
+            // 檢查是否為有效方向（不能反向）
+            if (opposite[newDirection] !== dir) {
+              nextDir = newDirection;
+            }
+          }
+        }
+
+        function handleJoystickEnd(e) {
+          if (!joystickActive) return;
+          e.preventDefault();
+          joystickActive = false;
+          joystickStick.classList.remove("moving");
+          // 搖桿回到中心
+          joystickStick.style.transform = "translate(-50%, -50%)";
+        }
+
+        // 觸控手勢控制
+        function handleTouchStart(e) {
+          if (!gameStarted) return;
+          e.preventDefault();
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+        }
+
+        function handleTouchEnd(e) {
+          if (!gameStarted) return;
+          e.preventDefault();
+          const touch = e.changedTouches[0];
+          const deltaX = touch.clientX - touchStartX;
+          const deltaY = touch.clientY - touchStartY;
+          const minSwipeDistance = 30;
+
+          if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // 水平滑動
+            if (Math.abs(deltaX) > minSwipeDistance) {
+              if (deltaX > 0 && opposite["ArrowRight"] !== dir) {
+                nextDir = "ArrowRight";
+              } else if (deltaX < 0 && opposite["ArrowLeft"] !== dir) {
+                nextDir = "ArrowLeft";
+              }
+            }
+          } else {
+            // 垂直滑動
+            if (Math.abs(deltaY) > minSwipeDistance) {
+              if (deltaY > 0 && opposite["ArrowDown"] !== dir) {
+                nextDir = "ArrowDown";
+              } else if (deltaY < 0 && opposite["ArrowUp"] !== dir) {
+                nextDir = "ArrowUp";
+              }
+            }
+          }
+        }
+
+        // 觸控反饋效果
+        function createTouchFeedback(x, y) {
+          const feedback = document.createElement("div");
+          feedback.className = "touch-feedback";
+          feedback.style.left = x - 10 + "px";
+          feedback.style.top = y - 10 + "px";
+          document.body.appendChild(feedback);
+
+          setTimeout(() => {
+            document.body.removeChild(feedback);
+          }, 600);
+        }
+
+        // 添加震動動畫
+        const style = document.createElement("style");
+        style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+    `;
+        document.head.appendChild(style);
+
+        document.addEventListener("DOMContentLoaded", () => {
+          createBoard();
+
+          // 鍵盤控制
+          document.addEventListener("keydown", handleKey);
+
+          // 開始/重新開始按鈕
+          restartBtn.addEventListener("click", () => {
+            if (gameStarted) restart();
+            else startGame();
+          });
+
+          // 搖桿控制
+          joystickStick.addEventListener("touchstart", handleJoystickStart, {
+            passive: false,
+          });
+          joystickStick.addEventListener("touchmove", handleJoystickMove, {
+            passive: false,
+          });
+          joystickStick.addEventListener("touchend", handleJoystickEnd, {
+            passive: false,
+          });
+
+          // 滑鼠控制（桌面版）
+          joystickStick.addEventListener("mousedown", (e) => {
+            handleJoystickStart(e);
+            document.addEventListener("mousemove", handleJoystickMove);
+            document.addEventListener(
+              "mouseup",
+              () => {
+                handleJoystickEnd(e);
+                document.removeEventListener("mousemove", handleJoystickMove);
+              },
+              { once: true }
+            );
+          });
+
+          // 觸控手勢控制（遊戲區域）
+          boardEl.addEventListener("touchstart", handleTouchStart, {
+            passive: false,
+          });
+          boardEl.addEventListener("touchend", handleTouchEnd, {
+            passive: false,
+          });
+
+          // 防止頁面縮放
+          document.addEventListener(
+            "touchmove",
+            (e) => {
+              if (e.touches.length > 1) {
+                e.preventDefault();
+              }
+            },
+            { passive: false }
+          );
+
+          // 初始化遊戲但不開始
+          restart();
+        });
+      })();
+    </script>
+  </body>
+</html>
